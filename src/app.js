@@ -1,6 +1,6 @@
 
 const express = require('express')
-// require('dotenev').config()
+/ require('dotenev').config()
 const dotenv = require('dotenv')
 dotenv.config();
 
