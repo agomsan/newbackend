@@ -18,7 +18,7 @@ module.exports = {
       service_id: {
         type: Sequelize.INTEGER
       },
-      tattoo_artist_id: {
+      artist_id: {
         allowNull: true,
         type: Sequelize.INTEGER
       },
