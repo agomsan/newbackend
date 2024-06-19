@@ -3,6 +3,7 @@ const express = require('express')
 / require('dotenev').config()
 const dotenv = require('dotenv')
 dotenv.config();
+const apiRoutes = require("./routes");
 
 const app = express()
 
