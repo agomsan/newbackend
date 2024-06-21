@@ -32,26 +32,26 @@ serviceController.create = async (req, res) => {
 
 serviceController.getAll = async (req, res) => {
   try {
-    const sevices = await Service.findAll({
+    const services = await Service.findAll({
       attributes: { exclude: ["createdAt", "updatedAt"] },
     });
 
     res.status(200).json({
       success: true,
       message: "Services retrieved successfully",
-      data: sevices,
+      data: services,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error retrieving sevices",
+      message: "Error retrieving services",
       error: error.message,
     });
   }
 };
 
 serviceController.update = async (req, res) => {
-  const seviceId = req.params.id;
+  const serviceId = req.params.id;
   const { ...restServiceData } = req.body;
 
   try {
@@ -61,21 +61,21 @@ serviceController.update = async (req, res) => {
         message: "data is not valid",
       });
     }
-    const seviceToUpdate = await Service.findByPk(seviceId);
+    const serviceToUpdate = await Service.findByPk(serviceId);
 
-    if (!seviceToUpdate) {
+    if (!serviceToUpdate) {
       return res.status(404).json({
         success: true,
         message: "Service not found",
       });
     }
 
-    seviceToUpdate.set({
-      ...seviceToUpdate,
+    serviceToUpdate.set({
+      ...serviceToUpdate,
       ...restServiceData,
     });
 
-    await seviceToUpdate.save();
+    await serviceToUpdate.save();
 
     res.status(200).json({
       success: true,
@@ -91,12 +91,12 @@ serviceController.update = async (req, res) => {
 };
 
 serviceController.delete = async (req, res) => {
-  const seviceId = req.params.id;
+  const serviceId = req.params.id;
 
   try {
     const deleteResult = await Service.destroy({
       where: {
-        id: seviceId,
+        id: serviceId,
       },
     });
 
@@ -114,7 +114,7 @@ serviceController.delete = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting this sevice",
+      message: "Error deleting this service",
       error: error.message,
     });
   }

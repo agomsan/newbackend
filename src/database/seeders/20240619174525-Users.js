@@ -16,7 +16,6 @@ module.exports = {
           last_name: "Root",
           email: "root@root.com",
           password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
           role_id: 1
         },
         {
@@ -25,7 +24,6 @@ module.exports = {
           last_name: "Pozuelo",
           email: "jpozuelo@hotmail.com",
           password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
           role_id: 2
         },
         {
@@ -34,7 +32,6 @@ module.exports = {
           last_name: "Mento",
           email: "lolamento@icloud.com",
           password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
           role_id: 3
         },
         {
@@ -42,9 +39,7 @@ module.exports = {
           first_name: "Aitor",
           last_name: "Suarez",
           email: "Asuarez@hotmail.com",
-          password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
-          role_id: 3
+          password: bcrypt.hashSync(plainPassword, 10),          role_id: 3
         },
         {
           id: 5,
@@ -52,7 +47,6 @@ module.exports = {
           last_name: "Marco",
           email: "dmarco@hotmail.com",
           password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
           role_id: 3
         },
         {
@@ -61,7 +55,6 @@ module.exports = {
           last_name: "Chen",
           email: "mchen@hotmail.com",
           password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
           role_id: 3
         },
         {
@@ -70,7 +63,6 @@ module.exports = {
           last_name: "Luz",
           email: "fluz@hotmail.com",
           password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
           role_id: 3
         },
         {
@@ -79,7 +71,6 @@ module.exports = {
           last_name: "Mataró",
           email: "amataro@gmail.com",
           password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
           role_id: 3
         },
         {
@@ -88,7 +79,6 @@ module.exports = {
           last_name: "Gálvez",
           email: "jgalvez@hotmail.com",
           password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
           role_id: 4
         },
         {
@@ -97,7 +87,6 @@ module.exports = {
           last_name: "Rodríguez",
           email: "brodriguez@yahoo.com",
           password: bcrypt.hashSync(plainPassword, 10),
-          is_active: true,
           role_id: 4
         },
       ],

@@ -1,6 +1,4 @@
 'use strict';
-const bcrypt = require("bcrypt");
-const plainPassword = "12345678";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {

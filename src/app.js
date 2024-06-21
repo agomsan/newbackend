@@ -1,10 +1,13 @@
-const express = require("express") / require("dotenev").config();
+const express = require("express");
 const dotenv = require("dotenv");
-dotenv.config();
+const sequelize = require("./database/db");
 const apiRoutes = require("./routes");
-const Sequelize = require("sequelize");
+
+dotenv.config();
 
 const app = express();
+
+app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
 
@@ -15,20 +18,17 @@ app.get("/api/healthy", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port: ${PORT}`);
-});
-
+// Register API routes
 app.use("/api", apiRoutes);
 
 sequelize
   .authenticate()
   .then(() => {
-    console.log("🛢️  Database authenticated");
+    console.log(" Database authenticated");
 
     // start the server
     app.listen(PORT, () => {
-      console.log(`🚀 Server listening on port: ${PORT}`);
+      console.log(`Server listening on port: ${PORT}`);
     });
   })
   .catch(() => {
