@@ -1,6 +1,6 @@
 # REST API: backend-tattoo (tattoo studio project)
 <img src="./img/Logo.gif" width="1000"  alt="logo"/>
-## Table of Contents :file_folder:
+## Tabla de contenidos :file_folder:
 
 1. [Descripción](#descripción) :classical_building:
 2. [Stack](#stack) :gear:
@@ -69,7 +69,7 @@ Este proyecto consiste en crear una REST API para un estudio de tatuajes que per
 | GET    | `/api/services/:id` | ver mi cita              | Super Admin |
 
 ## 5. <a id="basededatos">Base de datos</a> :open_book:
-<img src="./img/database.png"  alt="basededatos"/>
+<img src="./img/Database.png" width="1000"  alt="DataBase"/>
 
 ## 6. <a id="instalación">Instalación </a>
 Para la instalación del proyecto, siga los siguientes pasos en el correspondiente órden:
