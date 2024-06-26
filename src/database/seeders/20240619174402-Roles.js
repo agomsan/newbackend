@@ -7,7 +7,7 @@ module.exports = {
      * Add seed commands here.
      *    */
     await queryInterface.bulkInsert(
-      "roles",
+      "Roles",
       [
         {
           id: 1,
@@ -34,7 +34,7 @@ module.exports = {
     /**
      * Add commands to revert seed here.
      **/
-    await queryInterface.bulkDelete('roles', null, {});
+    await queryInterface.bulkDelete('Roles', null, {});
 
   }
 };

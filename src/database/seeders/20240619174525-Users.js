@@ -8,7 +8,7 @@ module.exports = {
      * Add seed commands here.
      *    */
     await queryInterface.bulkInsert(
-      "users",
+      "Users",
       [
         {
           id: 1,
@@ -98,7 +98,7 @@ module.exports = {
     /**
      * Add commands to revert seed here.
      **/
-    await queryInterface.bulkDelete('users', null, {});
+    await queryInterface.bulkDelete('Users', null, {});
 
   }
 };

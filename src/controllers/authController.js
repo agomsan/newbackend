@@ -59,7 +59,7 @@ authController.login = async (req, res) => {
 
       if (!email || !password) {
          return res.status(400).json({
-            success: true,
+            success: false,
             message: "email and password are required",
          });
       }

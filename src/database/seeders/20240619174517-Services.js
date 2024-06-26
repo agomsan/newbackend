@@ -6,7 +6,7 @@ module.exports = {
      * Add seed commands here.
      **/
 
-    await queryInterface.bulkInsert('services', [{
+    await queryInterface.bulkInsert('Services', [{
       service_name: 'Tatuajes personalizados',
       description: 'Decide tu tatuaje diseñándolo en conjunto con nuestros artistas'
     },
@@ -28,7 +28,7 @@ module.exports = {
     /**
      * Add commands to revert seed here.
      **/
-    await queryInterface.bulkDelete('services', null, {});
+    await queryInterface.bulkDelete('Services', null, {});
 
   }
 };

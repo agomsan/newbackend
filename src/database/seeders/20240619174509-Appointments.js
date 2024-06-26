@@ -6,7 +6,7 @@ module.exports = {
     /**
      * Add seed commands here.
      **/
-      await queryInterface.bulkInsert('appointments', [
+      await queryInterface.bulkInsert('Appointments', [
         {
         appointment_date: '2024-06-08',
         user_id: 2,
@@ -45,6 +45,6 @@ module.exports = {
     /**
      * Add commands to revert seed here.
      **/
-      await queryInterface.bulkDelete('appointments', null, {});
+      await queryInterface.bulkDelete('Appointments', null, {});
   }
 };

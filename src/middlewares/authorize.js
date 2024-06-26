@@ -1,8 +1,8 @@
-module.exports = (...allowedRoles) => {
+module.exports = (allowedRoles) => {
   return (req, res, next) => {
     const userRoleName = req.tokenData.userRoleName;
     // Roles that are always allowed
-    const adminGroupRoles = ["admin"];
+    const adminGroupRoles = ["Super Admin"];
 
     // Access if user is an admin group role
     if (adminGroupRoles.includes(userRoleName)) {

@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
 
   if (!token)
     return res.status(401).json({
-      success: true,
+      success: false,
       message: "not authorized",
     });
 
