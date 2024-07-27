@@ -8,13 +8,13 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // Muchos a uno
+      // lots to one association
       User.belongsTo(models.Role, {
         as: "role",
         foreignKey: "role_id",
       });
 
-      // uno a Muchos
+      // lots to one association
       User.hasMany(models.Appointment, {
         as: "appointments",
         foreignKey: "user_id",

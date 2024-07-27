@@ -41,12 +41,12 @@ Este proyecto consiste en crear una REST API para un estudio de tatuajes que per
 
 | Method | URI                                    | Action                       | Rol         |
 |--------|----------------------------------------|------------------------------|-------------|
-| GET    | `/api/users`                           | Ver los usuarios             | Super Admin |
+| GET    | `/api/users`                           | Ver los usuarios             | super_admin |
 | GET    | `/api/users/profile`                   | Ver nuestro perfil           |             |
 | PUT    | `/api/users/profile`                   | Modificar nuestro perfil     |             |
-| DELETE | `/api/users/:id`                       | Borrar usuario               | Super Admin |
-| PUT    | `/api/users/:id/role`                  | Cambiar rol                  | Super Admin |
-| GET    | `/api/users/artist`                    | Listado artistas             | Super Admin |
+| DELETE | `/api/users/:id`                       | Borrar usuario               | super_admin |
+| PUT    | `/api/users/:id/role`                  | Cambiar rol                  | super_admin |
+| GET    | `/api/users/artist`                    | Listado artistas             | super_admin |
 
 
 ### Appointments
@@ -64,9 +64,9 @@ Este proyecto consiste en crear una REST API para un estudio de tatuajes que per
 | Method | URI                 | Action                   | Rol         |
 |--------|---------------------|--------------------------|-------------|
 | GET    | `/api/services`     | Ver mis citas            |             |
-| POST   | `/api/services`     | Crear cita               | Super Admin |
-| PUT    | `/api/services/:id` | Modificar cita           | Super Admin |
-| GET    | `/api/services/:id` | ver mi cita              | Super Admin |
+| POST   | `/api/services`     | Crear cita               | super_admin |
+| PUT    | `/api/services/:id` | Modificar cita           | super_admin |
+| GET    | `/api/services/:id` | ver mi cita              | super_admin |
 
 ## 5. <a id="basededatos">Base de datos</a> :open_book:
 <img src="./img/Database.png" width="1000"  alt="DataBase"/>

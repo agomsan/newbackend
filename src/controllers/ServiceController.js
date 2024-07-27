@@ -1,17 +1,17 @@
-const { Service } = require("../models");
 const serviceController = {};
+const { Service } = require("../models/index");
 
 serviceController.create = async (req, res) => {
   const { service_name, description } = req.body;
 
   try {
     if (!service_name || !description) {
-      return res.status(400).json({
+      res.status(400).json({
         success: true,
-        message: "Service name is not valid",
+        message: "Invalid Information",
       });
+      return;
     }
-
     await Service.create({
       service_name,
       description,
@@ -19,12 +19,12 @@ serviceController.create = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Service created successfully",
+      message: "Services created successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error creating Service",
+      message: "Error creating service",
       error: error.message,
     });
   }
@@ -35,16 +35,43 @@ serviceController.getAll = async (req, res) => {
     const services = await Service.findAll({
       attributes: { exclude: ["createdAt", "updatedAt"] },
     });
-
     res.status(200).json({
       success: true,
-      message: "Services retrieved successfully",
+      message: "Services retreived successfully",
       data: services,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error retrieving services",
+      message: "Error retreived service",
+      error: error.message,
+    });
+  }
+};
+
+serviceController.getById = async (req, res) => {
+  const serviceId = req.params.id;
+
+  try {
+    const service = await Service.findByPk(serviceId, {
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+    });
+
+    if (!service) {
+      return res.status(404).json({
+        success: true,
+        message: "Service not found",
+      });
+      return;
+    }
+    res.status(200).json({
+      success: true,
+      data: service,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retreived service",
       error: error.message,
     });
   }
@@ -52,39 +79,23 @@ serviceController.getAll = async (req, res) => {
 
 serviceController.update = async (req, res) => {
   const serviceId = req.params.id;
-  const { ...restServiceData } = req.body;
+  const serviceData = req.body;
 
   try {
-    if (req.body && Object.keys(req.body).length === 0) {
-      return res.status(404).json({
-        success: true,
-        message: "data is not valid",
-      });
-    }
-    const serviceToUpdate = await Service.findByPk(serviceId);
-
-    if (!serviceToUpdate) {
-      return res.status(404).json({
-        success: true,
-        message: "Service not found",
-      });
-    }
-
-    serviceToUpdate.set({
-      ...serviceToUpdate,
-      ...restServiceData,
+    await Service.update(serviceData, {
+      where: {
+        id: serviceId,
+      },
     });
-
-    await serviceToUpdate.save();
 
     res.status(200).json({
       success: true,
-      message: "Service updated successfully",
+      message: "Services update successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error updating Service",
+      message: "Error updating service",
       error: error.message,
     });
   }
@@ -101,20 +112,21 @@ serviceController.delete = async (req, res) => {
     });
 
     if (deleteResult === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: true,
         message: "Service not found",
       });
+      return;
     }
 
     res.status(200).json({
       success: true,
-      message: "Service deleted successfully",
+      message: "Services deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting this service",
+      message: "Error deleting service",
       error: error.message,
     });
   }

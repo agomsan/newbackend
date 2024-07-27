@@ -1,16 +1,19 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const cors = require("cors");
 const sequelize = require("./database/db");
-const apiRoutes = require("./routes");
-
+const apiRoutes = require("./routes/index")
 dotenv.config();
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
 
+//healthy
 app.get("/api/healthy", (req, res) => {
   res.status(200).json({
     success: true,
@@ -18,17 +21,17 @@ app.get("/api/healthy", (req, res) => {
   });
 });
 
-// Register API routes
 app.use("/api", apiRoutes);
+
 
 sequelize
   .authenticate()
   .then(() => {
-    console.log(" Database authenticated");
+    console.log("Database authenticated");
 
-    // start the server
+    //star the server
     app.listen(PORT, () => {
-      console.log(`Server listening on port: ${PORT}`);
+      console.log(`server listening on port: ${PORT}`);
     });
   })
   .catch(() => {

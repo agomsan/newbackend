@@ -1,213 +1,57 @@
-const { Op } = require("sequelize");
-const { Appointment, Service, User } = require("../models");
 const appointmentController = {};
-const { dateValidator } = require("../helpers/validators");
+const { User, Appointment, Service, Artists } = require("../models/index");
 
 appointmentController.create = async (req, res) => {
-  const { appointment_date, service_id, artist_id } = req.body;
-  const user_id = req.tokenData.userId;
+  const { appointment_date, user_id, service_id, artist_id } = req.body;
 
   try {
-    if (
-      !appointment_date ||
-      !user_id ||
-      !service_id ||
-      !dateValidator(appointment_date)
-    ) {
+    if (!appointment_date || !user_id) {
       return res.status(400).json({
-        success: true,
-        message: "Invalid appointment date",
+        success: false,
+        message: "Invalid Information: Please provide appointment_date and user_id",
       });
     }
 
-    const appointments = await Appointment.findOne({
-      where: {
-        user_id: user_id,
-        appointment_date: {
-          [Op.gt]: new Date(), // Op.gt es el mayor que
-        },
-      },
-    });
-
-    if (appointments != null) {
-      return res.status(400).json({
-        success: true,
-        message: "You already have an appointment",
+    let newAppointment;
+    if (service_id && artist_id) {
+      newAppointment = await Appointment.create({
+        appointment_date,
+        user_id,
+        service_id,
+        artist_id,
+      });
+    } else {
+      newAppointment = await Appointment.create({
+        appointment_date,
+        user_id,
       });
     }
 
-    await Appointment.create({
-      appointment_date,
-      user_id,
-      service_id,
-      artist_id,
-    });
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "Appointment generated successfully",
+      message: "Appointment created successfully",
+      appointment: newAppointment,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error creating appointment:", error);
+    return res.status(500).json({
       success: false,
-      message: "Error generating Appointment",
-      error: error.message,
-    });
-  }
-};
-
-appointmentController.getMyAppointments = async (req, res) => {
-  try {
-    const userId = req.tokenData.userId;
-    const appointments = await Appointment.findAll({
-      where: { user_id: userId },
-      attributes: {
-        exclude: [
-          "createdAt",
-          "updatedAt",
-          "user_id",
-          "service_id",
-          "artist_id",
-        ],
-      },
-      include: [
-        {
-          model: Service,
-          as: "services",
-          attributes: { exclude: ["createdAt", "updatedAt"] },
-        },
-        {
-          model: User,
-          as: "artist",
-          attributes: {
-            exclude: ["createdAt", "updatedAt", "role_id", "email", "password"],
-          },
-        },
-      ],
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Appointments retrieved successfully",
-      data: appointments,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error recovering your appointments",
-      error: error.message,
-    });
-  }
-};
-
-appointmentController.getById = async (req, res) => {
-  const user_id = req.tokenData.userId;
-  const appointmentId = req.params.id;
-  try {
-    const appointment = await Appointment.findOne({
-      where: {
-        id: appointmentId,
-        user_id: user_id,
-      },
-      attributes: {
-        exclude: [
-          "createdAt",
-          "updatedAt",
-          "user_id",
-          "service_id",
-          "artist_id",
-        ],
-      },
-      include: [
-        {
-          model: User,
-          as: "user",
-          attributes: {
-            exclude: ["createdAt", "updatedAt", "role_id", "password"],
-          },
-        },
-        {
-          model: Service,
-          as: "services",
-          attributes: { exclude: ["createdAt", "updatedAt"] },
-        },
-        {
-          model: User,
-          as: "artist",
-          attributes: {
-            exclude: ["createdAt", "updatedAt", "role_id", "email", "password"],
-          },
-        },
-      ],
-    });
-    if (!appointment) {
-      return res.status(404).json({
-        success: true,
-        message: "appointment not found",
-        data: appointmentId,
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Appointment retrieved successfully",
-      data: appointment,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error recovering appointment",
+      message: "Error creating appointment",
       error: error.message,
     });
   }
 };
 
 appointmentController.update = async (req, res) => {
-  const { ...restAppointmentData } = req.body;
-  const userId = req.tokenData.userId;
+  const appointmentId = req.params.id;
+  const appointmentData = req.body;
+
   try {
-    const myAppointment = await Appointment.findOne({
-      where: { user_id: userId },
+    await Appointment.update(appointmentData, {
+      where: {
+        id: appointmentId,
+      },
     });
-
-    if (myAppointment === null) {
-      return res.status(404).json({
-        success: true,
-        message: "No appointments",
-      });
-    }
-
-    if (req.body && Object.keys(req.body).length === 0) {
-      return res.status(404).json({
-        success: true,
-        message: "The data is not valid",
-      });
-    }
-
-    if (
-      req.body.appointment_date &&
-      !dateValidator(req.body.appointment_date)
-    ) {
-      return res.status(404).json({
-        success: true,
-        message: "The date is not valid",
-      });
-    }
-    const appointmentToUpdate = await Appointment.findByPk(myAppointment.id);
-
-    if (!appointmentToUpdate) {
-      return res.status(404).json({
-        success: true,
-        message: "Appointment can't be found",
-      });
-    }
-
-    appointmentToUpdate.set({
-      ...appointmentToUpdate,
-      ...restAppointmentData,
-    });
-
-    await appointmentToUpdate.save();
 
     res.status(200).json({
       success: true,
@@ -216,7 +60,7 @@ appointmentController.update = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error updating Appointment",
+      message: "Error updating appointment",
       error: error.message,
     });
   }
@@ -233,10 +77,11 @@ appointmentController.delete = async (req, res) => {
     });
 
     if (deleteResult === 0) {
-      return res.status(404).json({
-        success: true,
+      res.status(404).json({
+        success: false,
         message: "Appointment not found",
       });
+      return;
     }
 
     res.status(200).json({
@@ -251,5 +96,129 @@ appointmentController.delete = async (req, res) => {
     });
   }
 };
+
+appointmentController.getById = async (req, res) => {
+  try {
+    const appointmentId = req.params.id;
+    const userId = req.tokenData.userId;
+
+    const appointment = await Appointment.findOne({
+      where: {
+        id: appointmentId,
+        user_id: userId,
+      },
+      include: [
+        {
+          model: Service,
+          as: "service",
+          attributes: ['service_name'],
+        },
+        {
+          model: Artists,
+          as: "artist",
+          attributes: ['name'],
+        },
+      ],
+      attributes: {
+        exclude: ["createdAt", "updatedAt", "password", "user_id", "service_id", "artist_id"],
+      },
+    });
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Appointment retrieved successfully",
+      data: appointment,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving appointment",
+      error: error.message,
+    });
+  }
+};
+
+appointmentController.getAllAppointments = async (req, res) => {
+  try {
+    const appointments = await Appointment.findAll({
+      include: [
+        {
+          model: Service,
+          as: "service",
+          attributes: ['service_name'],
+        },
+        {
+          model: Artists,
+          as: "artist",
+          attributes: ['name'],
+        },
+        {
+          model: User,
+          as: "user",
+          attributes: ['id', 'first_name', 'last_name'],
+        },
+      ],
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: appointments,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving appointments",
+      error: error.message,
+    });
+  }
+};
+
+
+appointmentController.getUserAppointments = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const appointments = await Appointment.findAll({
+      where: { user_id: userId },
+      include: [
+        {
+          model: Service,
+          as: "service",
+          attributes: ['service_name'],
+        },
+        {
+          model: Artists,
+          as: "artist",
+          attributes: ['name'],
+        },
+      ],
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: appointments,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving user appointments",
+      error: error.message,
+    });
+  }
+};
+
 
 module.exports = appointmentController;

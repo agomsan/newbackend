@@ -10,33 +10,34 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // Muchos a uno
+      // appointment{n}---{1}user
       Appointment.belongsTo(models.User, {
-        as: "user",
+        as: 'user',
         foreignKey: "user_id",
       });
-
-      // Muchos a uno
+      // appointment{n}---{1}service
       Appointment.belongsTo(models.Service, {
-        as: "services",
+        as: 'service',
         foreignKey: "service_id",
       });
-
-      // Muchos a uno
-      Appointment.belongsTo(models.User, {
-        as: "tattoo_artists",
-        foreignKey: "tattoo_artist_id",
+      // appointment{n}---{1}artist
+      Appointment.belongsTo(models.Artists, {
+        as: 'artist',
+        foreignKey: "artist_id",
       });
+
+
     }
   }
   Appointment.init({
     appointment_date: DataTypes.DATE,
-    user_id: DataTypes.INTEGER,
+    user_id:DataTypes.INTEGER,
     service_id: DataTypes.INTEGER,
-    tattoo_artist_id: DataTypes.INTEGER,
+    artist_id: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Appointment',
+    tableName: 'appointments'
   });
   return Appointment;
 };

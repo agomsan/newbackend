@@ -1,21 +1,22 @@
 const express = require("express");
 const router = express.Router();
-const ctrl = require("../controllers/userController");
+const crtl = require("../controllers/userController");
 const auth = require("../middlewares/auth");
 const authorize = require("../middlewares/authorize");
 
-router.get("/profile", auth, ctrl.getUserProfile);
-router.put("/profile", auth, ctrl.updateUserProfile);
-router.get("/tattoo_artist", auth, ctrl.getTattooArtist);
-router.get("/", auth, authorize("Super Admin"), (req, res, next) => {
-  // Si el parámetro de consulta 'email' está presente, se dirige la solicitud al metodo getByEmail
-  if (req.query.email) {
-    return ctrl.getByEmail(req, res, next);
-  }
-  // Si no hay parámetro 'email', dirigir la solicitud al metodo getAll
-  return ctrl.getAll(req, res, next);
-});
+// User routes
 
-router.put("/:id/:role", auth, authorize("Super Admin"), ctrl.update);
-router.delete("/:id", auth, authorize("Super Admin"), ctrl.delete);
+router.get("/appointments", auth, crtl.getUserAppointments);
+router.get("/profile", auth, crtl.getUserProfile);
+router.put("/profile", auth, crtl.updateUserProfile);
+
+//protected routes
+
+router.get("/", auth, authorize("super_admin"), crtl.getAll);
+router.get("/email", auth, authorize("super_admin"), crtl.getUserByEmail);
+router.get("/:id", auth, authorize("super_admin"), crtl.getById);
+router.put("/:id", auth, authorize("super_admin"), crtl.update);
+router.delete("/:id", auth, authorize("super_admin"), crtl.delete);
+router.get("/:id/appointments", auth, authorize("super_admin"), crtl.getAppointmentsByUserId);
+
 module.exports = router;

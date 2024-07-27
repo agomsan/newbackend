@@ -1,22 +1,13 @@
-const { User, Role } = require("../models");
-const bcrypt = require("bcrypt");
 const userController = {};
+const appointment = require("../models/appointment");
+const { User, Appointment, Service, Artists, Role } = require("../models/index");
+const bcrypt = require("bcrypt");
 
 userController.getAll = async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: {
-        exclude: ["createdAt", "updatedAt", "password", "role_id"],
-      },
-      include: [
-        {
-          model: Role,
-          as: "role",
-          attributes: { exclude: ["createdAt", "updatedAt"] },
-        },
-      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "password"] },
     });
-
     res.status(200).json({
       success: true,
       message: "Users retrieved successfully",
@@ -31,35 +22,24 @@ userController.getAll = async (req, res) => {
   }
 };
 
-userController.getByEmail = async (req, res) => {
-  const userEmail = req.query.email;
+userController.getById = async (req, res) => {
+  const userId = req.params.id;
+
   try {
-    const user = await User.findOne({
-      include: [
-        {
-          model: Role,
-          as: "role",
-          attributes: { exclude: ["createdAt", "updatedAt"] },
-        },
-      ],
-      where: {
-        email: userEmail,
-      },
-      attributes: {
-        exclude: ["createdAt", "updatedAt", "password", "role_id"],
-      },
+    const user = await User.findByPk(userId, {
+      attributes: { exclude: ["createdAt", "updatedAt", "password"] },
     });
+
     if (!user) {
       return res.status(404).json({
         success: true,
         message: "User not found",
       });
+      return;
     }
-    user_role = user.role ? user.role.name : null;
 
     res.status(200).json({
       success: true,
-      message: "User retrieved successfully",
       data: user,
     });
   } catch (error) {
@@ -73,35 +53,39 @@ userController.getByEmail = async (req, res) => {
 
 userController.update = async (req, res) => {
   const userId = req.params.id;
-  const userRole = req.params.role;
+  const { password, role_id, ...restUserData } = req.body;
+
   try {
-    if (req.body && Object.keys(req.body).length === 0) {
-      return res.status(404).json({
-        success: true,
-        message: "Invalid data",
-      });
-    }
     const userToUpdate = await User.findByPk(userId);
 
     if (!userToUpdate) {
-      return res.status(404).json({
+      res.status(404).json({
         success: true,
         message: "User not found",
       });
+      return;
     }
 
-    userToUpdate.role_id = userRole;
+    if (password) {
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      userToUpdate.password = hashedPassword;
+    }
+
+    userToUpdate.set({
+      ...userToUpdate,
+      ...restUserData,
+    });
 
     await userToUpdate.save();
 
     res.status(200).json({
       success: true,
-      message: "User updated successfully",
+      message: "User update successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error updating user",
+      message: "Error updating Users",
       error: error.message,
     });
   }
@@ -118,10 +102,11 @@ userController.delete = async (req, res) => {
     });
 
     if (deleteResult === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: true,
         message: "User not found",
       });
+      return;
     }
 
     res.status(200).json({
@@ -131,7 +116,184 @@ userController.delete = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting user",
+      message: "Error deleting User",
+      error: error.message,
+    });
+  }
+};
+
+userController.getAppointmentsByUserId = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const user = await User.findByPk(userId, {
+      include: [
+        {
+          model: Appointment,
+          as: "appointments",
+          include: [
+            {
+              model: Service,
+              as: "service",
+            },
+          ],
+          include: [
+            {
+              model: Artists,
+              as: "artist",
+              attributes: {
+                exclude: ["createdAt", "updatedAt"],
+              },
+            },
+          ],
+
+          attributes: {
+            exclude: [
+              "createdAt",
+              "updatedAt",
+              "password",
+              "user_id",
+              "service_id",
+              "artist_id",
+            ],
+          },
+        },
+      ],
+    });
+
+    if (!user) {
+      res.status(404).json({
+        success: true,
+        message: "User not found",
+      });
+
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "user appointment retrieved successfully",
+      data: user.appointments,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving users Appointment",
+      error: error.message,
+    });
+  }
+};
+
+userController.getUserByEmail = async (req, res) => {
+  try {
+    const email = req.query.email;
+
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email query parameter is required" });
+    }
+
+    const user = await User.findOne({
+      where: { email },
+      include: [
+        {
+          model: Appointment,
+          as: "appointments",
+          attributes: {
+            exclude: [
+              "createdAt",
+              "updatedAt",
+              "user_id",
+              "service_id",
+              "artist_id",
+            ],
+          },
+          include: [
+            {
+              model: Service,
+              as: "service",
+            },
+          ],
+          include: [
+            {
+              model: Artists,
+              as: "artist",
+              attributes: {
+                exclude: ["createdAt", "updatedAt"],
+              },
+            },
+          ],
+        },
+      ],
+      attributes: {
+        exclude: ["password", "createdAt", "updatedAt", "role_id"],
+      },
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Email not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Email retrieved successfully",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving Email",
+      error: error.message,
+    });
+  }
+};
+
+userController.getUserAppointments = async (req, res) => {
+  try {
+    const userId = req.tokenData.userId;
+
+    const appointments = await Appointment.findAll({
+      where: { user_id: userId },
+      include: [
+        {
+          model: Service,
+          as: "service",
+          attributes: {
+            exclude: ["createdAt", "updatedAt", "service_id", "description"],
+          },
+        },
+        {
+          model: Artists,
+          as: "artist",
+          attributes: {
+            exclude: [
+              "createdAt",
+              "updatedAt",
+              "service_id",
+              "artist_id",
+              "Bio",
+              "Specialty",
+            ],
+          },
+        },
+      ],
+      attributes: {
+        exclude: ["createdAt", "updatedAt", "service_id", "artist_id"],
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Appointments retrieved successfully",
+      data: appointments,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving Appointments",
       error: error.message,
     });
   }
@@ -142,21 +304,16 @@ userController.getUserProfile = async (req, res) => {
 
   try {
     const user = await User.findByPk(userId, {
-      attributes: {
-        exclude: ["createdAt", "updatedAt", "password", "role_id"],
-      },
-      include: [
-        {
-          model: Role,
-          as: "role",
-          attributes: { exclude: ["createdAt", "updatedAt"] },
-        },
-      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "password"] },
+      include: {
+        model: Role,
+        as: 'role',
+        attributes: ['name']
+      }
     });
 
     res.status(200).json({
       success: true,
-      message: "User retrieved successfully",
       data: user,
     });
   } catch (error) {
@@ -175,12 +332,7 @@ userController.updateUserProfile = async (req, res) => {
   try {
     const userToUpdate = await User.findByPk(userId);
 
-    if (!userToUpdate) {
-      return res.status(404).json({
-        success: true,
-        message: "User not found",
-      });
-    }
+    
 
     if (password) {
       const hashedPassword = bcrypt.hashSync(password, 10);
@@ -196,44 +348,12 @@ userController.updateUserProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "User updated successfully",
+      message: "User update successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error updating user",
-      error: error.message,
-    });
-  }
-};
-
-userController.getTattooArtist = async (req, res) => {
-  try {
-    const user = await User.findAll({
-      where: {
-        role_id: 4,
-      },
-      attributes: {
-        exclude: ["createdAt", "updatedAt", "password", "role_id", "email"],
-      },
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        success: true,
-        message: "No tattoo artists",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Users retrieved successfully",
-      data: user,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error retrieving user",
+      message: "Error updating Users",
       error: error.message,
     });
   }

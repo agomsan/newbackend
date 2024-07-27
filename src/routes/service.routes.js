@@ -1,12 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const ctrl = require("../controllers/serviceController");
+const ctrl = require("../controllers/ServiceController");
 const auth = require("../middlewares/auth");
 const authorize = require("../middlewares/authorize");
 
+//public
+router.get("/",  ctrl.getAll);
+router.get("/:id",  ctrl.getById);
 
-router.post("/", auth, authorize("Super Admin"), ctrl.create);
-router.get("/", ctrl.getAll);
-router.put("/:id", auth, authorize("Super Admin"), ctrl.update);
-router.delete("/:id", auth, authorize("Super Admin"), ctrl.delete);
+
+//protected routes
+router.post("/",  auth, authorize("super_admin"), ctrl.create);
+router.put("/:id",auth, authorize("super_admin"), ctrl.update);
+router.delete("/:id", auth, authorize("super_admin"), ctrl.delete);
+
 module.exports = router;
