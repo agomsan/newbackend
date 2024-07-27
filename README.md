@@ -104,7 +104,7 @@ Para la instalación del proyecto, siga los siguientes pasos en el correspondien
   
 ## 8. <a id="link">Link</a> 
 
-https://github.com/agomsan/backend-tattoo
+https://github.com/agomsan/newbackend.git
 
 ## 9. <a id="desarrollador">Desarrollador</a> :wave:
 
